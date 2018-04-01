@@ -12,7 +12,4 @@ while IFS='=' read -r name value ; do
   fi
 done < <(env)
 
-echo openshift:x:$UID:$UID::/var/spool/postfix:/sbin/nologin >> /etc/passwd
-echo mail_owner=openshift >> /etc/postfix/main.cf
-
-LD_PRELOAD="liblogfaf.so" exec /tini -- fakeroot "$@"
+PSEUDO_LIBDIR=/lib64 PSEUDO_PASSWD=/ PSEUDO_BINDIR=/usr/local/bin PSEUDO_LOCALSTATEDIR=/tmp PSEUDO_DEBUG=5 LD_PRELOAD="liblogfaf.so libpseudo.so" exec /tini -- "$@"
