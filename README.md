@@ -1,3 +1,6 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/jkroepke/openshift-mta.svg)](https://hub.docker.com/r/jkroepke/openshift-mta/)
+[![Docker Stars](https://img.shields.io/docker/stars/jkroepke/openshift-mta.svg)](https://hub.docker.com/r/jkroepke/openshift-mta/)
+
 # openshift-mta
 MTA in a docker primary designed for Red Hat's secure Openshift environment.
 
