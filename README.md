@@ -3,6 +3,11 @@ MTA in a docker primary designed for Red Hat's secure Openshift environment.
 
 This MTA based on the __*powerful, efficient, and scalable Mail Transport Agent*__ sendmail. 🎉
 
+# Variants
+I'm currently testing some other variants like postfix, exim and some other ugly MTAs.
+
+You can find the current status here: https://github.com/jkroepke/openshift-mta/blob/master/VARIANTS.md
+
 # Configuration
 
 ## Volumes
