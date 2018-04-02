@@ -16,7 +16,6 @@ export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-/etc/p
 export SENDMAIL_DEFINE_confPID_FILE=${SENDMAIL_DEFINE_confPID_FILE:-/tmp/sendmail.pid}
 export SENDMAIL_DEFINE_confTRUSTED_USER=${SENDMAIL_DEFINE_confTRUSTED_USER:-openshift}
 export SENDMAIL_DEFINE_confDEF_USER_ID=${SENDMAIL_DEFINE_confDEF_USER_ID:-openshift:root}
-export SENDMAIL_DEFINE_confAUTH_MECHANISMS=${SENDMAIL_DEFINE_confAUTH_MECHANISMS:-plain}
 export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/var/spool/mqueue/statistics}
 export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
@@ -59,7 +58,7 @@ fi
 
 # Enable debug
 if [ ! -z "${SENDMAIL_DEBUG}" ] && [ "${SENDMAIL_DEBUG}" == "true" ]; then
-    set -- "$@" "-X" "/dev/stdout"
+    set -- "$@" "-d" "-X" "/dev/stdout"
 fi
 
 # https://stackoverflow.com/a/25765360
@@ -79,8 +78,12 @@ echo "openshift:x:$(id -u):$(id -g)::/tmp:/sbin/nologin" >> /etc/passwd
 
 /etc/mail/make
 
-# Setup log environment
-mkfifo /tmp/log
-tail --pid=1 -f /tmp/log &
+export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
-LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log} LD_PRELOAD="liblogfaf.so" exec "$@"
+# Setup log environment
+if [[ "${LIBLOGFAF_SENDTO}" != '/dev/'* ]]; then
+    mkfifo ${LIBLOGFAF_SENDTO}
+    tail --pid=1 -f ${LIBLOGFAF_SENDTO} &
+fi
+
+LD_PRELOAD="liblogfaf.so" exec "$@"
