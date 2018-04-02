@@ -1,0 +1,13 @@
+--- proto.m4.orig	2018-04-02 14:26:47.000000000 +0200
++++ proto.m4	2018-04-02 14:28:14.000000000 +0200
+@@ -2265,10 +2265,6 @@
+
+ # check client name: first: did it resolve?
+ dnl input: ignored
+-R$*			$: < $&{client_resolve} >
+-R<TEMP>			$#TEMP $@ 4.4.0 $: "450 Relaying temporarily denied. Cannot resolve PTR record for " $&{client_addr}
+-R<FORGED>		$#error $@ 5.7.1 $: "550 Relaying denied. IP name possibly forged " $&{client_name}
+-R<FAIL>			$#error $@ 5.7.1 $: "550 Relaying denied. IP name lookup failed " $&{client_name}
+ dnl ${client_resolve} should be OK, so go ahead
+ R$*			$: <@> $&{client_name}
+ dnl should not be necessary since it has been done for client_addr already
