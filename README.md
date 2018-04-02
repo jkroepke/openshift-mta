@@ -1,5 +1,7 @@
 # openshift-mta
-MTA in a Docker primary designed for secure Openshift environment
+MTA in a docker primary designed for Red Hat's secure Openshift environment.
+
+This MTA based on the __*powerful, efficient, and scalable Mail Transport Agent*__ sendmail. 🎉
 
 # Configuration
 
