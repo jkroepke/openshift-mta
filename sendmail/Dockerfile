@@ -1,7 +1,7 @@
 FROM        centos:7
 
 EXPOSE      25
-VOLUME      /var/spool/mqueue/
+#VOLUME      /var/spool/mqueue/
 ENTRYPOINT  ["/entrypoint.sh"]
 CMD         ["/usr/sbin/sendmail", "-bs", "-bD", "-v", "-d0.1", "-Am"]
 

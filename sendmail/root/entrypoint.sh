@@ -34,7 +34,6 @@ fi
 # Override sendmails access files.
 if [ ! -z "${SENDMAIL_ACCESS}" ]; then
     echo -e "${SENDMAIL_ACCESS}" > /etc/mail/access
-    rm /etc/mail/access.db
 fi
 
 # Disable check for lookup sender IP. Require for kubernetes based environments
@@ -61,7 +60,26 @@ fi
 
 # Enable debug
 if [ ! -z "${SENDMAIL_DEBUG}" ] && [ "${SENDMAIL_DEBUG}" == "true" ]; then
-    set -- "$@" "-d" "-X" "/dev/stdout"
+    set -- "$@" "-d" "-X" "/proc/fd/self/1"
+fi
+
+# Force receiver address
+if [ ! -z "${SENDMAIL_FORCE_SENDER_ADDRESS}" ]; then
+
+fi
+
+# Force receiver address
+if [ ! -z "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" ]; then
+    if  [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ]; then
+        export SENDMAIL_FEATURE_mailertable=true
+        if [[ ${SENDMAIL_DEFINE_SMART_HOST} == *':'* ]]; then
+            echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS} ${SENDMAIL_DEFINE_SMART_HOST}" >> /etc/mail/mailertable
+        else
+            echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS} smtp:${SENDMAIL_DEFINE_SMART_HOST}" >> /etc/mail/mailertable
+        fi
+    fi
+
+    export SENDMAIL_DEFINE_SMART_HOST="smtp:${SENDMAIL_FORCE_RECEIVER_ADDRESS}"
 fi
 
 if [ ! -z "${SENDMAIL_RAW_PREPEND}" ]; then
@@ -88,10 +106,6 @@ while IFS='=' read -r name value ; do
             else
                 sed -i "s/MAILER(smtp)dnl/FEATURE\(\`${name/SENDMAIL_FEATURE_/}'\, \`${!name//\//\\/}')dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
             fi
-        elif [[ $name == 'SENDMAIL_SUBMIT_DEFINE_'* ]]; then
-            sed -i "s/FEATURE\(\`msp', \`\[127.0.0.1\]'\)dnl/define\(\`${name/SENDMAIL_SUBMIT_DEFINE_/}', \`${!name}')dnl\nFEATURE(\`msp', \`\[127.0.0.1\]')dnl/" /etc/mail/submit.mc
-        elif [[ $name == 'SENDMAIL_SUBMIT_FEATURE_'* ]] && [[ "${!name}" == "true" ]]; then
-            sed -i "s/FEATURE\(\`msp', \`\[127.0.0.1\]'\)dnl/FEATURE\(\`${name/SENDMAIL_SUBMIT_FEATURE_/}'\)dnl\nFEATURE(\`msp', \`\[127.0.0.1\]')dnl/" /etc/mail/submit.mc
         fi
         unset ${name}
     fi
@@ -109,12 +123,15 @@ if [ ! -z "${_LOCAL_CONFIG}" ]; then
     unset _LOCAL_CONFIG
 fi
 
+# prevent error:
+# makemap: error opening type hash map *.db: File changed after open
+rm -f /etc/mail/*.db
 /etc/mail/make
 
 export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
 # Setup log environment
-if [[ "${LIBLOGFAF_SENDTO}" != '/dev/'* ]]; then
+if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
     mkfifo ${LIBLOGFAF_SENDTO}
     tail --pid=1 -f ${LIBLOGFAF_SENDTO} &
 fi
