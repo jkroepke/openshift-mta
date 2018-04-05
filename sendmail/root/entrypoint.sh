@@ -19,7 +19,6 @@ export SENDMAIL_DEFINE_confLOG_LEVEL=${SENDMAIL_DEFINE_confLOG_LEVEL:-9}
 export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-/etc/pki/tls/certs}
 export SENDMAIL_DEFINE_confPID_FILE=${SENDMAIL_DEFINE_confPID_FILE:-/tmp/sendmail.pid}
 export SENDMAIL_DEFINE_confTRUSTED_USER=${SENDMAIL_DEFINE_confTRUSTED_USER:-openshift}
-export SENDMAIL_DEFINE_confDEF_USER_ID=${SENDMAIL_DEFINE_confDEF_USER_ID:-openshift:root}
 export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/var/spool/mqueue/statistics}
 export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
@@ -65,21 +64,34 @@ fi
 
 # Force receiver address
 if [ ! -z "${SENDMAIL_FORCE_SENDER_ADDRESS}" ]; then
+    export _LOCAL_PART=$(echo "${SENDMAIL_FORCE_SENDER_ADDRESS}" | cut -d@ -f1)
+    export _DOMAIN_PART=$(echo "${SENDMAIL_FORCE_SENDER_ADDRESS}" | cut -d@ -f2)
 
+    # http://www.harker.com/sendmail/rules-overview.html
+    export SENDMAIL_RAW_APPEND=$(cat <<EOF
+${SENDMAIL_RAW_APPEND}
+LOCAL_RULE_1
+R \$+@\$+\t\$@ ${_LOCAL_PART} < @ ${_DOMAIN_PART}. >
+EOF
+)
+    unset _LOCAL_PART
+    unset _DOMAIN_PART
 fi
 
 # Force receiver address
 if [ ! -z "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" ]; then
-    if  [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ]; then
-        export SENDMAIL_FEATURE_mailertable=true
-        if [[ ${SENDMAIL_DEFINE_SMART_HOST} == *':'* ]]; then
-            echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS} ${SENDMAIL_DEFINE_SMART_HOST}" >> /etc/mail/mailertable
-        else
-            echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS} smtp:${SENDMAIL_DEFINE_SMART_HOST}" >> /etc/mail/mailertable
-        fi
-    fi
+    export _LOCAL_PART=$(echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" | cut -d@ -f1)
+    export _DOMAIN_PART=$(echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" | cut -d@ -f2)
 
-    export SENDMAIL_DEFINE_SMART_HOST="smtp:${SENDMAIL_FORCE_RECEIVER_ADDRESS}"
+    # https://serverfault.com/questions/356160/configure-sendmail-to-only-send-to-local-domain
+    export SENDMAIL_RAW_APPEND=$(cat <<EOF
+${SENDMAIL_RAW_APPEND}
+LOCAL_RULE_0
+R\$* < \$*. > \$*\t\$: ${_LOCAL_PART} < @ ${_DOMAIN_PART}. > \$3
+EOF
+)
+    unset _LOCAL_PART
+    unset _DOMAIN_PART
 fi
 
 if [ ! -z "${SENDMAIL_RAW_PREPEND}" ]; then
@@ -88,10 +100,6 @@ fi
 
 if [ ! -z "${SENDMAIL_RAW_APPEND}" ]; then
     _RAW_APPEND="${SENDMAIL_RAW_APPEND}"
-fi
-
-if [ ! -z "${SENDMAIL_LOCAL_CONFIG}" ]; then
-    _LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}"
 fi
 
 # https://stackoverflow.com/a/25765360
@@ -116,11 +124,6 @@ echo "openshift:x:$(id -u):$(id -g)::/tmp:/sbin/nologin" >> /etc/passwd
 if [ ! -z "${_RAW_APPEND}" ]; then
     echo -e "${_RAW_APPEND}" >> /etc/mail/sendmail.mc
     unset _RAW_APPEND
-fi
-if [ ! -z "${_LOCAL_CONFIG}" ]; then
-    echo -e "\nLOCAL_CONFIG" >> /etc/mail/sendmail.mc
-    echo -e "${_LOCAL_CONFIG}" >> /etc/mail/sendmail.mc
-    unset _LOCAL_CONFIG
 fi
 
 # prevent error:
