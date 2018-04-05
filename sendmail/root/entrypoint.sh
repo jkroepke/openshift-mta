@@ -8,15 +8,9 @@ fi
 export SENDMAIL_FEATURE_no_default_msa=${SENDMAIL_FEATURE_no_default_msa:-true}
 export SENDMAIL_FEATURE_nouucp=${SENDMAIL_FEATURE_nouucp:-nospecial}
 
-#if [ -f /var/run/secrets/kubernetes.io/serviceaccount/namespace ]; then
-#    echo "Kubernetes environment detected ..."
-#    export SENDMAIL_DEFINE_confDOMAIN_NAME=${SENDMAIL_DEFINE_confDOMAIN_NAME:-"${HOSTNAME}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local"}
-#else
-#    export SENDMAIL_DEFINE_confDOMAIN_NAME=${SENDMAIL_DEFINE_confDOMAIN_NAME:-"${HOSTNAME}.docker.local"}
-#fi
-
 export SENDMAIL_DEFINE_confLOG_LEVEL=${SENDMAIL_DEFINE_confLOG_LEVEL:-9}
 export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-/etc/pki/tls/certs}
+export SENDMAIL_DEFINE_QUEUE_DIR=${SENDMAIL_DEFINE_QUEUE_DIR:-/var/spool/mqueue}
 export SENDMAIL_DEFINE_confPID_FILE=${SENDMAIL_DEFINE_confPID_FILE:-/tmp/sendmail.pid}
 export SENDMAIL_DEFINE_confTRUSTED_USER=${SENDMAIL_DEFINE_confTRUSTED_USER:-openshift}
 export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/var/spool/mqueue/statistics}
