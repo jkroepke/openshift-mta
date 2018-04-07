@@ -110,11 +110,15 @@ while IFS='=' read -r name value ; do
     fi
 done < <(env)
 
-echo "openshift:x:$(id -u):$(id -g)::/tmp:/sbin/nologin" >> /etc/passwd
-
 if [ ! -z "${_RAW_APPEND}" ]; then
     echo -e "${_RAW_APPEND}" >> /etc/mail/sendmail.mc
     unset _RAW_APPEND
+fi
+
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+     echo "${USER_NAME:-openshift}:x:$(id -u):0:${USER_NAME:-openshift}:/tmp:/sbin/nologin" >> /etc/passwd
+  fi
 fi
 
 # prevent error:

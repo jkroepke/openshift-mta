@@ -20,3 +20,5 @@ RUN         yum install -y patch sendmail sendmail-cf cyrus-sasl-plain cyrus-sas
 COPY        root /
 
 RUN         chmod u+s /lib64/liblogfaf.so
+
+USER        1001
