@@ -27,6 +27,11 @@ if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_RELAYHOST_USER
 fi
 
 # Override sendmails access files.
+if [ ! -z "${SENDMAIL_FORCE_TLS_VERIFY}" ] && [ "${SENDMAIL_FORCE_TLS_VERIFY}" == "true" ]; then
+    export SENDMAIL_ACCESS="${SENDMAIL_ACCESS}\\nTLS_Srv VERIFY+CN\\n"
+fi
+
+# Override sendmails access files.
 if [ ! -z "${SENDMAIL_ACCESS}" ]; then
     echo -e "${SENDMAIL_ACCESS}" > /etc/mail/access
 fi

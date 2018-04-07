@@ -32,6 +32,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_RELAYHOST_USER` | Relayhost authentification user |
 | `SENDMAIL_RELAYHOST_PASSWORD` | Relayhost authentification password |
 | `SENDMAIL_RELAYHOST_AUTH` | Relayhost authentification method. Defaults to: `PLAIN` |
+| `SENDMAIL_FORCE_TLS_VERIFY` | TLS verify must be valid.  |
 | `SENDMAIL_FORCE_SENDER_ADDRESS` | Rewrite FROM header in all messages  |
 | `SENDMAIL_FORCE_RECEIVER_ADDRESS` | Send all messages to this mailbox. Useful for qa environments |
 | `SENDMAIL_RAW_PREPEND` | Raw configuration prepends to the `sendmail.mc` |
