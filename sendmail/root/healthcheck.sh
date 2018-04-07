@@ -8,7 +8,7 @@ fi
 
 if ! timeout 2 cat <(echo MAIL) > /dev/tcp/localhost/25
 then
-    echo "Port 25 is not open closed."
+    echo "Port 25 is not open."
     exit 1
 fi
 

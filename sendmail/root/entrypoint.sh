@@ -7,13 +7,15 @@ fi
 
 export SENDMAIL_FEATURE_no_default_msa=${SENDMAIL_FEATURE_no_default_msa:-true}
 export SENDMAIL_FEATURE_nouucp=${SENDMAIL_FEATURE_nouucp:-nospecial}
+export SENDMAIL_FEATURE_nocanonify=${SENDMAIL_FEATURE_nocanonify:-true}
 
 export SENDMAIL_DEFINE_confLOG_LEVEL=${SENDMAIL_DEFINE_confLOG_LEVEL:-9}
-export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-/etc/pki/tls/certs}
+export SENDMAIL_DEFINE_confCACERT=${SENDMAIL_DEFINE_confCACERT:-/etc/pki/tls/certs/ca-bundle.trust.crt}
+export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-${SENDMAIL_DEFINE_confCACERT%%${SENDMAIL_DEFINE_confCACERT##*/}}}
 export SENDMAIL_DEFINE_QUEUE_DIR=${SENDMAIL_DEFINE_QUEUE_DIR:-/var/spool/mqueue}
 export SENDMAIL_DEFINE_confPID_FILE=${SENDMAIL_DEFINE_confPID_FILE:-/tmp/sendmail.pid}
 export SENDMAIL_DEFINE_confTRUSTED_USER=${SENDMAIL_DEFINE_confTRUSTED_USER:-openshift}
-export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/var/spool/mqueue/statistics}
+export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/dev/null}
 export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
 # Add authentication for relay hosts
@@ -45,7 +47,7 @@ else
     echo "DAEMON_OPTIONS(\`Port=smtp, Name=MTA')dnl" >> /etc/mail/sendmail.mc
 fi
 
-# Drop bounces
+# TODO: Drop bounces
 if [ ! -z "${SENDMAIL_DROP_BOUNCE_MAILS}" ] && [ "${SENDMAIL_DROP_BOUNCE_MAILS}" == "true" ]; then
     echo '| /dev/null' > /tmp/.forward
     export SENDMAIL_DEFINE_LUSER_RELAY=local:openshift
@@ -58,34 +60,24 @@ fi
 
 # Force receiver address
 if [ ! -z "${SENDMAIL_FORCE_SENDER_ADDRESS}" ]; then
-    export _LOCAL_PART=$(echo "${SENDMAIL_FORCE_SENDER_ADDRESS}" | cut -d@ -f1)
-    export _DOMAIN_PART=$(echo "${SENDMAIL_FORCE_SENDER_ADDRESS}" | cut -d@ -f2)
-
     # http://www.harker.com/sendmail/rules-overview.html
     export SENDMAIL_RAW_APPEND=$(cat <<EOF
 ${SENDMAIL_RAW_APPEND}
 LOCAL_RULE_1
-R \$+@\$+\t\$@ ${_LOCAL_PART} < @ ${_DOMAIN_PART}. >
+R \$+@\$+\\t\$@ ${SENDMAIL_FORCE_RECEIVER_ADDRESS%%@*} < @ ${SENDMAIL_FORCE_RECEIVER_ADDRESS##*@}. >
 EOF
 )
-    unset _LOCAL_PART
-    unset _DOMAIN_PART
 fi
 
 # Force receiver address
 if [ ! -z "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" ]; then
-    export _LOCAL_PART=$(echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" | cut -d@ -f1)
-    export _DOMAIN_PART=$(echo "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" | cut -d@ -f2)
-
     # https://serverfault.com/questions/356160/configure-sendmail-to-only-send-to-local-domain
     export SENDMAIL_RAW_APPEND=$(cat <<EOF
 ${SENDMAIL_RAW_APPEND}
 LOCAL_RULE_0
-R\$* < \$*. > \$*\t\$: ${_LOCAL_PART} < @ ${_DOMAIN_PART}. > \$3
+R\$* < \$*. > \$*\\t\$: ${SENDMAIL_FORCE_RECEIVER_ADDRESS%%@*} < @ ${SENDMAIL_FORCE_RECEIVER_ADDRESS##*@}. > \$3
 EOF
 )
-    unset _LOCAL_PART
-    unset _DOMAIN_PART
 fi
 
 if [ ! -z "${SENDMAIL_RAW_PREPEND}" ]; then
@@ -109,7 +101,7 @@ while IFS='=' read -r name value ; do
                 sed -i "s/MAILER(smtp)dnl/FEATURE\(\`${name/SENDMAIL_FEATURE_/}'\, \`${!name//\//\\/}')dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
             fi
         fi
-        unset ${name}
+        unset "${name}"
     fi
 done < <(env)
 
@@ -129,8 +121,8 @@ export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
 # Setup log environment
 if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
-    mkfifo ${LIBLOGFAF_SENDTO}
-    tail --pid=1 -f ${LIBLOGFAF_SENDTO} &
+    mkfifo "${LIBLOGFAF_SENDTO}"
+    tail --pid=1 -f "${LIBLOGFAF_SENDTO}" &
 fi
 
 if [ ! -z "${ENTRYPOINT_DEBUG}" ]; then

@@ -46,6 +46,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_DEFINE_confPID_FILE` | /tmp/sendmail.pid |
 | `SENDMAIL_DEFINE_STATUS_FILE` | /var/spool/mqueue/statistics |
 | `SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL` | `GroupReadableKeyFile,GroupWritableDirPathSafe' |
+| `SENDMAIL_DISABLE_CLIENT_CERTIFICATES` | true |
 
 
 ### Advanced Variables
