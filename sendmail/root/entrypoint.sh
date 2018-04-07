@@ -8,6 +8,7 @@ fi
 export SENDMAIL_FEATURE_no_default_msa=${SENDMAIL_FEATURE_no_default_msa:-true}
 export SENDMAIL_FEATURE_nouucp=${SENDMAIL_FEATURE_nouucp:-nospecial}
 export SENDMAIL_FEATURE_nocanonify=${SENDMAIL_FEATURE_nocanonify:-true}
+export SENDMAIL_FEATURE_authinfo=${SENDMAIL_FEATURE_nocanonify:-true}
 
 export SENDMAIL_DEFINE_confLOG_LEVEL=${SENDMAIL_DEFINE_confLOG_LEVEL:-9}
 export SENDMAIL_DEFINE_confCACERT=${SENDMAIL_DEFINE_confCACERT:-/etc/pki/tls/certs/ca-bundle.trust.crt}
@@ -19,11 +20,10 @@ export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/dev/null}
 export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
 # Add authentication for relay hosts
-if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_RELAYHOST_USER}" ] && [ ! -z "${SENDMAIL_RELAYHOST_PASSWORD}" ]; then
+if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
     echo "Setting AuthInfo for relayhost '${SENDMAIL_DEFINE_SMART_HOST}'"
-    export SENDMAIL_RELAYHOST_AUTH=${SENDMAIL_RELAYHOST_AUTH:-PLAIN}
-    export SENDMAIL_FEATURE_authinfo=true
-    printf 'AuthInfo:%s "U:%s" "P:%s" "M:%s"' "${SENDMAIL_DEFINE_SMART_HOST}" "${SENDMAIL_RELAYHOST_USER}" "${SENDMAIL_RELAYHOST_PASSWORD}" "${SENDMAIL_RELAYHOST_AUTH}" >> /etc/mail/authinfo
+    export SENDMAIL_SMART_HOST_AUTH=${SENDMAIL_SMART_HOST_AUTH:-PLAIN}
+    printf 'AuthInfo:%s "U:%s" "P:%s" "M:%s"' "${SENDMAIL_SMART_HOST_USER}" "${SENDMAIL_RELAYHOST_USER}" "${SENDMAIL_SMART_HOST_PASSWORD}" "${SENDMAIL_SMART_HOST_AUTH}" >> /etc/mail/authinfo
 fi
 
 # Override sendmails access files.
