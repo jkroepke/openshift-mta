@@ -22,11 +22,13 @@ export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_
 
 
 cp /etc/aliases /etc/mail/aliases
+touch /etc/mail/authinfo
+
 # Add authentication for relay hosts
 if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
     echo "Setting AuthInfo for relayhost '${SENDMAIL_DEFINE_SMART_HOST}'"
     export SENDMAIL_SMART_HOST_AUTH=${SENDMAIL_SMART_HOST_AUTH:-PLAIN}
-    printf 'AuthInfo:%s "U:%s" "P:%s" "M:%s"' "${SENDMAIL_SMART_HOST_USER}" "${SENDMAIL_RELAYHOST_USER}" "${SENDMAIL_SMART_HOST_PASSWORD}" "${SENDMAIL_SMART_HOST_AUTH}" >> /etc/mail/authinfo
+    printf 'AuthInfo:%s "U:%s" "P:%s" "M:%s"' "${SENDMAIL_DEFINE_SMART_HOST}" "${SENDMAIL_SMART_HOST_USER}" "${SENDMAIL_SMART_HOST_PASSWORD}" "${SENDMAIL_SMART_HOST_AUTH}" >> /etc/mail/authinfo
 fi
 
 # Override sendmails access files.
@@ -68,7 +70,7 @@ fi
 
 # Enable debug
 if [ ! -z "${SENDMAIL_DEBUG}" ] && [ "${SENDMAIL_DEBUG}" == "true" ]; then
-    set -- "$@" "-d" "-X" "/proc/fd/self/1"
+    set -- "$@" "-d" "-X" "/proc/self/fd/1"
 fi
 
 # Force receiver address
@@ -132,9 +134,9 @@ fi
 # prevent error:
 # makemap: error opening type hash map *.db: File changed after open
 rm -f /etc/mail/*.db
-/etc/mail/make
 
 touch /etc/mail/aliases.db
+/etc/mail/make
 /usr/bin/newaliases
 
 export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
