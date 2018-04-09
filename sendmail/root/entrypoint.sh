@@ -17,7 +17,8 @@ export SENDMAIL_DEFINE_QUEUE_DIR=${SENDMAIL_DEFINE_QUEUE_DIR:-/var/spool/mqueue}
 export SENDMAIL_DEFINE_confPID_FILE=${SENDMAIL_DEFINE_confPID_FILE:-/tmp/sendmail.pid}
 export SENDMAIL_DEFINE_confTRUSTED_USER=${SENDMAIL_DEFINE_confTRUSTED_USER:-openshift}
 export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/dev/null}
-export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
+export SENDMAIL_DEFINE_ALIAS_FILE=${SENDMAIL_DEFINE_ALIAS_FILE:-/etc/mail/aliases}
+export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupWritableAliasFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
 # Add authentication for relay hosts
 if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
@@ -56,6 +57,11 @@ fi
 if [ ! -z "${SENDMAIL_DROP_BOUNCE_MAILS}" ] && [ "${SENDMAIL_DROP_BOUNCE_MAILS}" == "true" ]; then
     echo '| /dev/null' > /tmp/.forward
     export SENDMAIL_DEFINE_LUSER_RELAY=local:openshift
+fi
+
+# Define root alias
+if [ ! -z "${SENDMAIL_ROOT_ALIAS}" ]; then
+    echo "root: ${SENDMAIL_ROOT_ALIAS}" >> /etc/mail/aliases
 fi
 
 # Enable debug
@@ -116,9 +122,9 @@ if [ ! -z "${_RAW_APPEND}" ]; then
 fi
 
 if ! whoami &> /dev/null; then
-  if [ -w /etc/passwd ]; then
-     echo "${USER_NAME:-openshift}:x:$(id -u):0:${USER_NAME:-openshift}:/tmp:/sbin/nologin" >> /etc/passwd
-  fi
+    if [ -w /etc/passwd ]; then
+        echo "${USER_NAME:-openshift}:x:$(id -u):0:${USER_NAME:-openshift}:/tmp:/sbin/nologin" >> /etc/passwd
+    fi
 fi
 
 # prevent error:

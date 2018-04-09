@@ -13,9 +13,9 @@ RUN         yum install -y patch sendmail sendmail-cf cyrus-sasl-plain cyrus-sas
             sed -i "/.*accept_unresolvable_domains.*/d" /etc/mail/sendmail.mc && \
             sed -i "/.*Addr=127.0.0.1.*/d" /etc/mail/sendmail.mc && \
             newaliases && \
-            chmod g+w -R /etc/aliases.db /etc/mail/ /etc/passwd /usr/share/sendmail-cf/m4/proto.m4 && \
+            chmod g+w -R  /etc/aliases /etc/aliases.db /etc/mail/ /etc/passwd /usr/share/sendmail-cf/m4/proto.m4 && \
             chmod 777 -R /var/spool/mqueue && \
-            chgrp 0 -R /var/spool/mqueue
+            chgrp 0 -R /etc/aliases /etc/aliases.db /var/spool/mqueue
 
 COPY        root /
 
