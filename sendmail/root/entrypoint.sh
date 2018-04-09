@@ -8,7 +8,7 @@ fi
 export SENDMAIL_FEATURE_no_default_msa=${SENDMAIL_FEATURE_no_default_msa:-true}
 export SENDMAIL_FEATURE_nouucp=${SENDMAIL_FEATURE_nouucp:-nospecial}
 export SENDMAIL_FEATURE_nocanonify=${SENDMAIL_FEATURE_nocanonify:-true}
-export SENDMAIL_FEATURE_authinfo=${SENDMAIL_FEATURE_nocanonify:-true}
+export SENDMAIL_FEATURE_authinfo=${SENDMAIL_FEATURE_authinfo:-true}
 
 export SENDMAIL_DEFINE_QUEUE_DIR=${SENDMAIL_DEFINE_QUEUE_DIR:-/var/spool/mqueue}
 export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/dev/null}
