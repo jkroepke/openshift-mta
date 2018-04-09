@@ -20,6 +20,8 @@ export SENDMAIL_DEFINE_STATUS_FILE=${SENDMAIL_DEFINE_STATUS_FILE:-/dev/null}
 export SENDMAIL_DEFINE_ALIAS_FILE=${SENDMAIL_DEFINE_ALIAS_FILE:-/etc/mail/aliases}
 export SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL=${SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL:-"\`GroupReadableSASLDBFile,GroupWritableAliasFile,GroupReadableKeyFile,GroupWritableDirPathSafe'"}
 
+
+cp /etc/aliases /etc/mail/aliases
 # Add authentication for relay hosts
 if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
     echo "Setting AuthInfo for relayhost '${SENDMAIL_DEFINE_SMART_HOST}'"
@@ -61,7 +63,7 @@ fi
 
 # Define root alias
 if [ ! -z "${SENDMAIL_ROOT_ALIAS}" ]; then
-    echo "root: ${SENDMAIL_ROOT_ALIAS}" >> /etc/mail/aliases
+    echo -e "root:\\t${SENDMAIL_ROOT_ALIAS}" >> /etc/mail/aliases
 fi
 
 # Enable debug
@@ -131,6 +133,9 @@ fi
 # makemap: error opening type hash map *.db: File changed after open
 rm -f /etc/mail/*.db
 /etc/mail/make
+
+touch /etc/mail/aliases.db
+/usr/bin/newaliases
 
 export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
