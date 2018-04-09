@@ -29,7 +29,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_LISTEN` | Force sendmail to listen on specific address |
 | `SENDMAIL_DISABLE_SENDER_RDNS` | Remove sender ip lookup. Required on container based environments |
 | `SENDMAIL_ACCESS` | Additional sendmail access.db setting |
-| `SENDMAIL_ROOT_ALIAS` | Define alias for local root |
+| `SENDMAIL_ROOT_ALIAS` | Define alias for local root (Mail or `/dev/null`) |
 | `SENDMAIL_SMART_HOST_USER` | Relayhost authentification user |
 | `SENDMAIL_SMART_HOST_PASSWORD` | Relayhost authentification password |
 | `SENDMAIL_SMART_HOST_AUTH` | Relayhost authentification method. Defaults to: `PLAIN` |
@@ -43,18 +43,19 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 ### Default settings
 | Name | Value |
 | ---- | ----- |
-| `SENDMAIL_FEATURE_no_default_msa` | true |
-| `SENDMAIL_FEATURE_nouucp` | nospecial |
-| `SENDMAIL_FEATURE_nocanonify` | true |
-| `SENDMAIL_FEATURE_authinfo` | true |
-| `SENDMAIL_DEFINE_confLOG_LEVEL` | 9 |
-| `SENDMAIL_DEFINE_confCACERT_PATH` | /etc/pki/tls/certs/ca-bundle.trust.crt |
-| `SENDMAIL_DEFINE_confCACERT` | /etc/pki/tls/certs |
-| `SENDMAIL_DEFINE_confPID_FILE` | /tmp/sendmail.pid |
-| `SENDMAIL_DEFINE_STATUS_FILE` | /dev/null |
-| `SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL` | `GroupReadableKeyFile,GroupWritableDirPathSafe' |
-| `SENDMAIL_DISABLE_CLIENT_CERTIFICATES` | true |
-| `SENDMAIL_SMART_HOST_AUTH` | PLAIN |
+| `SENDMAIL_FEATURE_no_default_msa` | `true` |
+| `SENDMAIL_FEATURE_nouucp` | `nospecial` |
+| `SENDMAIL_FEATURE_nocanonify` | `true` |
+| `SENDMAIL_FEATURE_authinfo` | `true` |
+| `SENDMAIL_SMART_HOST_AUTH` | `PLAIN` |
+| `SENDMAIL_DEFINE_STATUS_FILE` | `/dev/null` |
+| `SENDMAIL_DEFINE_ALIAS_FILE` | `/etc/mail/aliases` |
+| `SENDMAIL_DEFINE_QUEUE_DIR` | `/var/spool/mqueue` |
+| `SENDMAIL_DEFINE_confLOG_LEVEL` | `9` |
+| `SENDMAIL_DEFINE_confCACERT_PATH` | `/etc/pki/tls/certs/ca-bundle.trust.crt` |
+| `SENDMAIL_DEFINE_confCACERT` | `/etc/pki/tls/certs` |
+| `SENDMAIL_DEFINE_confPID_FILE` | `/tmp/sendmail.pid` |
+| `SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL` | `` `GroupReadableSASLDBFile,GroupWritableAliasFile,GroupReadableKeyFile,GroupWritableDirPathSafe' `` |
 | `SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS` | `+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3 +SSL_OP_CIPHER_SERVER_PREFERENCE` |
 | `SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS` | `+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3` |
 | `SENDMAIL_DEFINE_confCIPHER_LIST` | `HIGH:MEDIUM:!aNULL:!eNULL@STRENGTH` |
