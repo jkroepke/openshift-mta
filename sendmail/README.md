@@ -54,7 +54,9 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL` | `GroupReadableKeyFile,GroupWritableDirPathSafe' |
 | `SENDMAIL_DISABLE_CLIENT_CERTIFICATES` | true |
 | `SENDMAIL_SMART_HOST_AUTH` | PLAIN |
-
+| `SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS` | `+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3 +SSL_OP_CIPHER_SERVER_PREFERENCE` |
+| `SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS` | `+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3` |
+| `SENDMAIL_DEFINE_confCIPHER_LIST` | `HIGH:MEDIUM:!aNULL:!eNULL@STRENGTH` |
 
 ### Advanced Variables
 
