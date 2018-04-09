@@ -80,7 +80,7 @@ fi
 if [ ! -z "${SENDMAIL_FORCE_SENDER_ADDRESS}" ]; then
     # http://www.harker.com/sendmail/rules-overview.html
     export SENDMAIL_RAW_APPEND=$(cat <<EOF
-${SENDMAIL_RAW_APPEND}
+${SENDMAIL_RAW_APPEND}\\n
 LOCAL_RULE_1
 R \$+@\$+\\t\$@ ${SENDMAIL_FORCE_RECEIVER_ADDRESS%%@*} < @ ${SENDMAIL_FORCE_RECEIVER_ADDRESS##*@}. >
 EOF
@@ -91,7 +91,7 @@ fi
 if [ ! -z "${SENDMAIL_FORCE_RECEIVER_ADDRESS}" ]; then
     # https://serverfault.com/questions/356160/configure-sendmail-to-only-send-to-local-domain
     export SENDMAIL_RAW_APPEND=$(cat <<EOF
-${SENDMAIL_RAW_APPEND}
+${SENDMAIL_RAW_APPEND}\\n
 LOCAL_RULE_0
 R\$* < \$*. > \$*\\t\$: ${SENDMAIL_FORCE_RECEIVER_ADDRESS%%@*} < @ ${SENDMAIL_FORCE_RECEIVER_ADDRESS##*@}. > \$3
 EOF
@@ -99,37 +99,32 @@ EOF
 fi
 
 if [ ! -z "${SENDMAIL_RAW_PREPEND}" ]; then
-    sed -i "s/MAILER(smtp)dnl/FEATURE\(\`${SENDMAIL_RAW_PREPEND}'\)dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
+    sed -i "s/MAILER(smtp)dnl/FEATURE(\`${SENDMAIL_RAW_PREPEND}')dnl\\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
 fi
-
 
 # OpenSSL Options are available in 8.15.1 or later
 if [ ! -z "${SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS}" ]; then
-  export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\nO ServerSSLOptions=${SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS}"
-  unset SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS
+    export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\\nO ServerSSLOptions=${SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS}"
+    unset SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS
 fi
 
 if [ ! -z "${SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS}" ]; then
-  export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\nO ClientSSLOptions=${SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS}"
-  unset SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS
+    export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\\nO ClientSSLOptions=${SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS}"
+    unset SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS
 fi
 
 if [ ! -z "${SENDMAIL_DEFINE_confCIPHER_LIST}" ]; then
-  export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\nO CipherList=${SENDMAIL_DEFINE_confCIPHER_LIST}"
-  unset SENDMAIL_DEFINE_confCIPHER_LIST
+    export SENDMAIL_LOCAL_CONFIG="${SENDMAIL_LOCAL_CONFIG}\\nO CipherList=${SENDMAIL_DEFINE_confCIPHER_LIST}"
+    unset SENDMAIL_DEFINE_confCIPHER_LIST
 fi
 
 if [ ! -z "${SENDMAIL_LOCAL_CONFIG}" ]; then
-    export SENDMAIL_RAW_APPEND=$(cat <<EOF
-${SENDMAIL_RAW_APPEND}
-LOCAL_CONFIG
-${SENDMAIL_LOCAL_CONFIG}
-EOF
-)
+    export SENDMAIL_RAW_APPEND="${SENDMAIL_RAW_APPEND}\\n\\nLOCAL_CONFIG\\n${SENDMAIL_LOCAL_CONFIG}"
 fi
 
+# Save SENDMAIL_RAW_APPEND because the loop will remove all SENDMAIL_ envs
 if [ ! -z "${SENDMAIL_RAW_APPEND}" ]; then
-    _RAW_APPEND="${SENDMAIL_RAW_APPEND}"
+    export _RAW_APPEND="${SENDMAIL_RAW_APPEND}"
 fi
 
 # https://stackoverflow.com/a/25765360
@@ -137,12 +132,12 @@ fi
 while IFS='=' read -r name value ; do
     if [[ $name == 'SENDMAIL_'* ]]; then
         if [[ $name == 'SENDMAIL_DEFINE_'* ]]; then
-            sed -i "s/MAILER(smtp)dnl/define\(\`${name/SENDMAIL_DEFINE_/}', \`${!name//\//\\/}')dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
+            sed -i "s/MAILER(smtp)dnl/define(\`${name/SENDMAIL_DEFINE_/}', \`${value//\//\\/}')dnl\\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
         elif [[ $name == 'SENDMAIL_FEATURE_'* ]]; then
-            if [[ "${!name}" == "true" ]]; then
-                sed -i "s/MAILER(smtp)dnl/FEATURE\(\`${name/SENDMAIL_FEATURE_/}'\)dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
+            if [[ "${value}" == "true" ]]; then
+                sed -i "s/MAILER(smtp)dnl/FEATURE(\`${name/SENDMAIL_FEATURE_/}')dnl\\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
             else
-                sed -i "s/MAILER(smtp)dnl/FEATURE\(\`${name/SENDMAIL_FEATURE_/}'\, \`${!name//\//\\/}')dnl\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
+                sed -i "s/MAILER(smtp)dnl/FEATURE(\`${name/SENDMAIL_FEATURE_/}', \`${value//\//\\/}')dnl\\nMAILER(smtp)dnl/" /etc/mail/sendmail.mc
             fi
         fi
         unset "${name}"
@@ -154,30 +149,32 @@ if [ ! -z "${_RAW_APPEND}" ]; then
     unset _RAW_APPEND
 fi
 
+# From https://docs.openshift.com/container-platform/3.9/creating_images/guidelines.html#use-uid
 if ! whoami &> /dev/null; then
     if [ -w /etc/passwd ]; then
         echo "${USER_NAME:-openshift}:x:$(id -u):0:${USER_NAME:-openshift}:/tmp:/sbin/nologin" >> /etc/passwd
     fi
 fi
 
+if [ ! -z "${ENTRYPOINT_DEBUG}" ]; then
+    cat /etc/mail/sendmail.mc
+fi
+
 # prevent error:
 # makemap: error opening type hash map *.db: File changed after open
 rm -f /etc/mail/*.db
-
-touch /etc/mail/aliases.db
 /etc/mail/make
+
+# newaliases need an existing file.?
+touch /etc/mail/aliases.db
 /usr/bin/newaliases
 
+# Setup log environment (missing /dev/console on openshift containers)
 export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
-# Setup log environment
 if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
     mkfifo "${LIBLOGFAF_SENDTO}"
     tail --pid=1 -f "${LIBLOGFAF_SENDTO}" &
-fi
-
-if [ ! -z "${ENTRYPOINT_DEBUG}" ]; then
-    cat /etc/mail/sendmail.mc
 fi
 
 LD_PRELOAD="liblogfaf.so" exec "$@"
