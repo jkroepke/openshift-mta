@@ -38,6 +38,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_FORCE_RECEIVER_ADDRESS` | Send all messages to this mailbox. Useful for qa environments |
 | `SENDMAIL_RAW_PREPEND` | Raw configuration prepends to the `sendmail.mc` |
 | `SENDMAIL_RAW_APPEND` | Raw configuration appends to the `sendmail.mc` |
+| `SENDMAIL_LOCAL_CONFIG` | `LOCAL_CONFIG` configuration appends to the `sendmail.mc` |
 
 ### Default settings
 | Name | Value |
