@@ -72,6 +72,11 @@ if [ ! -z "${SENDMAIL_ROOT_ALIAS}" ]; then
     echo -e "root:\\t${SENDMAIL_ROOT_ALIAS}" >> /etc/mail/aliases
 fi
 
+# Queue interval
+if [ ! -z "${SENDMAIL_QUEUE_INTERVAL}" ]; then
+    set -- "$@" "-q" "${SENDMAIL_QUEUE_INTERVAL}"
+fi
+
 # Enable debug
 if [ ! -z "${SENDMAIL_DEBUG}" ] && [ "${SENDMAIL_DEBUG}" == "true" ]; then
     set -- "$@" "-d" "-X" "/proc/self/fd/1"
