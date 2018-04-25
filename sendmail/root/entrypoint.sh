@@ -28,6 +28,12 @@ export SENDMAIL_DEFINE_confCIPHER_LIST=${SENDMAIL_DEFINE_confCIPHER_LIST:-"HIGH:
 cp /etc/aliases /etc/mail/aliases
 touch /etc/mail/authinfo
 
+# Set custom port for relay host
+if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [[ "${SENDMAIL_DEFINE_SMART_HOST}" == *':'* ]]; then
+    export SENDMAIL_DEFINE_RELAY_MAILER_ARGS="TCP \$h ${SENDMAIL_DEFINE_SMART_HOST#*:}"
+    export SENDMAIL_DEFINE_SMART_HOST="${SENDMAIL_DEFINE_SMART_HOST%:*}";
+fi
+
 # Add authentication for relay hosts
 if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
     echo "Setting AuthInfo for relayhost '${SENDMAIL_DEFINE_SMART_HOST}'"
