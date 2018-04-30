@@ -40,6 +40,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_RAW_APPEND` | Raw configuration appends to the `sendmail.mc` |
 | `SENDMAIL_LOCAL_CONFIG` | `LOCAL_CONFIG` configuration appends to the `sendmail.mc` |
 | `SENDMAIL_QUEUE_INTERVAL` | sendmail's `-q` flag specifies how often a sub-daemon will run the queue.  |
+| `SENDMAIL_EXCLUDE_LOG_PATTERN` | Exclude logs from console output.  |
 
 ### Default settings
 | Name | Value |

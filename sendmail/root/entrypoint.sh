@@ -133,6 +133,10 @@ if [ ! -z "${SENDMAIL_RAW_APPEND}" ]; then
     export _RAW_APPEND="${SENDMAIL_RAW_APPEND}"
 fi
 
+if [ ! -z "${SENDMAIL_EXCLUDE_LOG_PATTERN}" ]; then
+    export _EXCLUDE_LOG_PATTERN="${SENDMAIL_EXCLUDE_LOG_PATTERN}"
+fi
+
 # https://stackoverflow.com/a/25765360
 # Configure sendmail from environments
 while IFS='=' read -r name value ; do
@@ -180,7 +184,13 @@ export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
 
 if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
     mkfifo "${LIBLOGFAF_SENDTO}"
-    tail --pid=1 -f "${LIBLOGFAF_SENDTO}" &
+    if [ ! -z "${_EXCLUDE_LOG_PATTERN}" ]; then
+        tail --pid=1 -f "${LIBLOGFAF_SENDTO}" | egrep -v "${_EXCLUDE_LOG_PATTERN}" &
+
+        unset _EXCLUDE_LOG_PATTERN
+    else
+        tail --pid=1 -f "${LIBLOGFAF_SENDTO}" &
+    fi
 fi
 
 LD_PRELOAD="liblogfaf.so" exec "$@"
