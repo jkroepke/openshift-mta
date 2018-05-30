@@ -62,6 +62,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS` | `+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3` |
 | `SENDMAIL_DEFINE_confCIPHER_LIST` | `HIGH:MEDIUM:!aNULL:!eNULL@STRENGTH` |
 | `SENDMAIL_DEFINE_confRUN_AS_USER` | `openshift:root` |
+| `SENDMAIL_DEFINE_confMAX_DAEMON_CHILDREN` | `20` |
 
 ### Advanced Variables
 
