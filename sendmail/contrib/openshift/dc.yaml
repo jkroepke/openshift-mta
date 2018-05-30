@@ -1,0 +1,63 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: mailout
+  name: mailout
+spec:
+  replicas: 1
+  selector:
+    name: mailout
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: mailout
+    spec:
+      containers:
+        - env:
+            - name: SENDMAIL_ROOT_ALIAS
+              value: /dev/null
+            - name: TZ
+              value: Europe/Berlin
+            - name: SENDMAIL_EXCLUDE_LOG_PATTERN
+              value: did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
+          image: jkroepke/openshift-mta:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - /healthcheck.sh
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: mailout
+          ports:
+            - containerPort: 25
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /healthcheck.sh
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 100m
+              memory: 150Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - mountPath: /var/spool/mqueue/
+              name: queue
+      subdomain: mailout
+      volumes:
+        - emptyDir: {}
+          name: queue
