@@ -54,6 +54,7 @@ You can find the current status here: https://github.com/jkroepke/openshift-mta/
 | `SENDMAIL_DEFINE_ALIAS_FILE` | `/etc/mail/aliases` |
 | `SENDMAIL_DEFINE_QUEUE_DIR` | `/var/spool/mqueue` |
 | `SENDMAIL_DEFINE_confLOG_LEVEL` | `9` |
+| `SENDMAIL_DEFINE_confMIN_QUEUE_AGE` | `10` |
 | `SENDMAIL_DEFINE_confCACERT_PATH` | `/etc/pki/tls/certs/ca-bundle.trust.crt` |
 | `SENDMAIL_DEFINE_confCACERT` | `/etc/pki/tls/certs` |
 | `SENDMAIL_DEFINE_confPID_FILE` | `/tmp/sendmail.pid` |
