@@ -24,7 +24,7 @@ ENV         SENDMAIL_FEATURE_no_default_msa=true \
             SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS="+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3" \
             SENDMAIL_DEFINE_confCIPHER_LIST="HIGH:MEDIUM:!aNULL:!eNULL@STRENGTH" \
             SENDMAIL_DEFINE_confMAX_DAEMON_CHILDREN=20 \
-            LIBLOGFAF_SENDTO=/tmp/log
+            LIBLOGFAF_SENDTO=/dev/tty
 
 COPY        root /
 

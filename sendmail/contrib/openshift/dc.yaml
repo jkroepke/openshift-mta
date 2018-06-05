@@ -21,8 +21,12 @@ spec:
               value: /dev/null
             - name: TZ
               value: Europe/Berlin
-            - name: SENDMAIL_EXCLUDE_LOG_PATTERN
-              value: did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
+            - name: SENDMAIL_DEFINE_confMIN_QUEUE_AGE
+              value: 10
+            - name: SENDMAIL_DEFINE_confSAFE_QUEUE
+              value: false
+            - name: LIBLOGFAF_SENDTO
+              value: /dev/tty
           image: jkroepke/openshift-mta:latest
           imagePullPolicy: Always
           livenessProbe:
@@ -54,6 +58,7 @@ spec:
             requests:
               cpu: 10m
               memory: 50Mi
+          tty: true
           volumeMounts:
             - mountPath: /var/spool/mqueue/
               name: queue
