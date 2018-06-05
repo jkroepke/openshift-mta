@@ -6,9 +6,9 @@ then
     exit 1
 fi
 
-if ! timeout 2 cat <(echo MAIL) > /dev/tcp/localhost/25
+if ! timeout 2 cat <(echo -e 'MAIL FROM:<root@localhost>\nQUIT') > /dev/tcp/localhost/25
 then
-    echo "Port 25 is not open."
+    echo "sendmail is not running anymore. Stopping."
     exit 1
 fi
 
