@@ -169,8 +169,6 @@ touch /etc/mail/aliases.db
 /usr/bin/newaliases
 
 # Setup log environment (missing /dev/console on openshift containers)
-export LIBLOGFAF_SENDTO=${LIBLOGFAF_SENDTO:-/tmp/log}
-
 if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
     mkfifo "${LIBLOGFAF_SENDTO}"
     if [ ! -z "${_EXCLUDE_LOG_PATTERN}" ]; then

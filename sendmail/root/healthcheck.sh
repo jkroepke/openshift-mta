@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! pgrep -x "tail" > /dev/null
+if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]] && ! pgrep -x "tail" > /dev/null
 then
     echo "tail is not running anymore. Stopping."
     exit 1
