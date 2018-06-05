@@ -8,5 +8,5 @@ before_install:
   - mkdir etc lib log
   - chmod 777 etc lib log
 
-install:
+script:
   - docker build -t sendmail sendmail
