@@ -6,9 +6,9 @@ then
     exit 1
 fi
 
-if ! timeout 2 cat <(echo -e 'MAIL FROM:<root@localhost>\nQUIT') > /dev/tcp/localhost/25
+if ! mailq > /dev/null
 then
-    echo "sendmail is not running anymore. Stopping."
+    echo "mailq not working anymore. Stopping."
     exit 1
 fi
 
