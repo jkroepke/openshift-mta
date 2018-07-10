@@ -9,4 +9,4 @@ before_install:
   - chmod 777 etc lib log
 
 script:
-  - docker build -t sendmail sendmail
+  - docker build -t sendmail .
