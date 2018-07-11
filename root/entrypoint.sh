@@ -50,6 +50,11 @@ else
     echo "DAEMON_OPTIONS(\`Port=smtp, Name=MTA')dnl" >> /etc/mail/sendmail.mc
 fi
 
+# Use TZ env
+if [ ! -z "${TZ}" ]; then
+  export SENDMAIL_DEFINE_confTIME_ZONE=USE_TZ
+fi
+
 # TODO: Drop bounces
 if [ ! -z "${SENDMAIL_DROP_BOUNCE_MAILS}" ] && [ "${SENDMAIL_DROP_BOUNCE_MAILS}" == "true" ]; then
     echo '| /dev/null' > /tmp/.forward

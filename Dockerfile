@@ -19,6 +19,7 @@ ENV         SENDMAIL_FEATURE_no_default_msa=true \
             SENDMAIL_DEFINE_confTRUSTED_USER=openshift \
             SENDMAIL_DEFINE_confRUN_AS_USER=openshift:root \
             SENDMAIL_DEFINE_confMIN_QUEUE_AGE=10 \
+            SENDMAIL_DEFINE_confSMTP_MAILER=smtp8 \
             SENDMAIL_DEFINE_confDONT_BLAME_SENDMAIL="`GroupReadableSASLDBFile,GroupWritableAliasFile,GroupReadableKeyFile,GroupWritableDirPathSafe'" \
             SENDMAIL_DEFINE_confSERVER_SSL_OPTIONS="+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3 +SSL_OP_CIPHER_SERVER_PREFERENCE" \
             SENDMAIL_DEFINE_confCLIENT_SSL_OPTIONS="+SSL_OP_NO_SSLv2 +SSL_OP_NO_SSLv3" \
