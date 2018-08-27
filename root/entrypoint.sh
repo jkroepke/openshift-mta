@@ -185,4 +185,4 @@ if [[ "${LIBLOGFAF_SENDTO}" == '/tmp/'* ]]; then
     fi
 fi
 
-LD_PRELOAD="/lib64/liblogfaf.so" exec $@
+LD_PRELOAD="/lib64/liblogfaf.so" exec "$@"
