@@ -5,6 +5,7 @@ if [ ! -z "${ENTRYPOINT_DEBUG}" ]; then
     set -x
 fi
 
+export SENDMAIL_DEFINE_confCACERT=$(readlink -f "${SENDMAIL_DEFINE_confCACERT}")
 export SENDMAIL_DEFINE_confCACERT_PATH=${SENDMAIL_DEFINE_confCACERT_PATH:-${SENDMAIL_DEFINE_confCACERT%%${SENDMAIL_DEFINE_confCACERT##*/}}}
 
 
@@ -19,9 +20,9 @@ fi
 
 # Add authentication for relay hosts
 if [ ! -z "${SENDMAIL_DEFINE_SMART_HOST}" ] && [ ! -z "${SENDMAIL_SMART_HOST_USER}" ] && [ ! -z "${SENDMAIL_SMART_HOST_PASSWORD}" ]; then
-    echo "Setting AuthInfo for relayhost '${SENDMAIL_DEFINE_SMART_HOST}'"
     export SENDMAIL_SMART_HOST_AUTH=${SENDMAIL_SMART_HOST_AUTH:-PLAIN}
-    printf 'AuthInfo:%s "U:%s" "P:%s" "M:%s"' "${SENDMAIL_DEFINE_SMART_HOST}" "${SENDMAIL_SMART_HOST_USER}" "${SENDMAIL_SMART_HOST_PASSWORD}" "${SENDMAIL_SMART_HOST_AUTH}" >> /etc/mail/authinfo
+    # http://www.sendmail.org/~ca/email/sm-812.html#812AUTH
+    printf 'AuthInfo: "U:%s" "P:%s" "M:%s"' "${SENDMAIL_SMART_HOST_USER}" "${SENDMAIL_SMART_HOST_PASSWORD}" "${SENDMAIL_SMART_HOST_AUTH}" >> /etc/mail/authinfo
 fi
 
 # Override sendmails access files.
