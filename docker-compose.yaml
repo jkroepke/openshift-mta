@@ -1,0 +1,23 @@
+version: "2"
+services:
+  mailout:
+    build: .
+    image: docker.io/jkroepke/openshift-mta
+    tty: true
+    hostname: mailout-0
+    domainname: mailout.svc.cluster.local
+    environment:
+      TZ: Europe/Berlin
+      LIBLOGFAF_SENDTO: /dev/tty
+#      SENDMAIL_DEFINE_SMART_HOST: ''
+#      SENDMAIL_SMART_HOST_USER: ''
+#      SENDMAIL_SMART_HOST_PASSWORD: ''
+#      SENDMAIL_AUTH_USER: TEST
+#      SENDMAIL_AUTH_PASSWORD: TEST
+#      SENDMAIL_DEFINE_confLOG_LEVEL: 16
+    ports:
+    - "25:25"
+    user: "1000730000:0"
+    tmpfs:
+    - /var/spool/clientmqueue:mode=770,uid=1000730000,gid=0
+    - /var/spool/mqueue:mode=770,uid=1000730000,gid=0
