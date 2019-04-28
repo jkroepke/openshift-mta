@@ -18,15 +18,15 @@ spec:
       containers:
         - env:
             - name: SENDMAIL_ROOT_ALIAS
-              value: /dev/null
+              value: "/dev/null"
             - name: TZ
-              value: Europe/Berlin
+              value: "Europe/Berlin"
             - name: SENDMAIL_DEFINE_confMIN_QUEUE_AGE
-              value: 10
+              value: "10"
             - name: SENDMAIL_DEFINE_confSAFE_QUEUE
-              value: false
+              value: "false"
             - name: LIBLOGFAF_SENDTO
-              value: /dev/tty
+              value: "/dev/tty"
           image: jkroepke/openshift-mta:latest
           imagePullPolicy: Always
           livenessProbe:
