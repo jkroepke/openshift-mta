@@ -4,7 +4,7 @@ EXPOSE      25
 VOLUME      /var/spool/mqueue/ /var/spool/clientmqueue
 HEALTHCHECK CMD ["/healthcheck.sh"]
 ENTRYPOINT  ["/entrypoint.sh"]
-CMD         ["/usr/sbin/sendmail", "-bs", "-bD", "-qp", "-Am"]
+CMD         ["/usr/sbin/sendmail", "-bs", "-bD", "-Am"]
 
 ENV         SENDMAIL_FEATURE_nouucp=nospecial \
             SENDMAIL_FEATURE_nocanonify=true \

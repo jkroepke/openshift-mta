@@ -90,14 +90,17 @@ if [ -n "${SENDMAIL_ROOT_ALIAS+x}" ]; then
     echo -e "root:\\t${SENDMAIL_ROOT_ALIAS}" >> /etc/mail/aliases
 fi
 
-# Queue interval
-if [ -n "${SENDMAIL_QUEUE_INTERVAL+x}" ]; then
-    set -- "$@" "-q" "${SENDMAIL_QUEUE_INTERVAL}"
-fi
-
 # Enable debug
 if [ -n "${SENDMAIL_DEBUG+x}" ] && [ "${SENDMAIL_DEBUG}" == "true" ]; then
     set -- "$@" "-d" "-X" "/proc/self/fd/1"
+else
+    # SENDMAIL: WARNING: Can not use -d with -q.  Disabling debugging.
+    set -- "$@" "-qp"
+
+    # Queue interval
+    if [ -n "${SENDMAIL_QUEUE_INTERVAL+x}" ]; then
+        set -- "$@" "-q" "${SENDMAIL_QUEUE_INTERVAL}"
+    fi
 fi
 
 # Force receiver address
