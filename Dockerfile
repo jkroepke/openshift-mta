@@ -2,7 +2,6 @@ FROM        centos:7
 
 EXPOSE      25
 VOLUME      /var/spool/mqueue/ /var/spool/clientmqueue
-HEALTHCHECK CMD ["/healthcheck.sh"]
 ENTRYPOINT  ["/entrypoint.sh"]
 CMD         ["/usr/sbin/sendmail", "-bs", "-bD", "-Am"]
 
