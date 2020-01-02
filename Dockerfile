@@ -1,4 +1,4 @@
-FROM        centos:7
+FROM        centos:8
 
 EXPOSE      25
 VOLUME      /var/spool/mqueue/ /var/spool/clientmqueue
@@ -33,7 +33,7 @@ ENV         SENDMAIL_FEATURE_nouucp=nospecial \
             LIBLOGFAF_SENDTO=/dev/tty
 
 RUN         set -euo pipefail \
-            && yum install -y patch sendmail sendmail-cf cyrus-sasl-plain cyrus-sasl-ntlm cyrus-sasl-md5 && yum clean all && rm -rf /var/cache/yum \
+            && yum install --nodocs -y patch sendmail sendmail-cf cyrus-sasl-plain cyrus-sasl-ntlm cyrus-sasl-md5 && yum clean all && rm -rf /var/cache/yum \
             && setcap 'cap_net_bind_service=+ep' /usr/sbin/sendmail.sendmail \
             && sed -i "/.*EXPOSED_USER.*/d" /etc/mail/sendmail.mc \
             && sed -i "/.*procmail.*/d" /etc/mail/sendmail.mc \
@@ -42,8 +42,8 @@ RUN         set -euo pipefail \
             && newaliases \
             && printf 'pwcheck_method: auxprop\nauxprop_plugin: sasldb\nsasldb_path: /etc/mail/sasldb2\nmech_list: PLAIN LOGIN CRAM-MD5 DIGEST-MD5 NTLM' > /etc/sasl2/Sendmail.conf \
             && echo NOOP | saslpasswd2 -c -p NOOP && saslpasswd2 -d NOOP \
-            && chgrp 0   -R /var/spool/clientmqueue /var/spool/mqueue /etc/sasldb2 /etc/aliases /etc/aliases.db \
-            && chmod g=u -R /var/spool/clientmqueue /var/spool/mqueue /etc/sasldb2 /etc/aliases /etc/aliases.db /etc/mail/ /etc/passwd /usr/share/sendmail-cf/m4/proto.m4
+            && chgrp 0   -R /etc/pki/tls/private/sendmail.key /var/spool/clientmqueue /var/spool/mqueue /etc/sasldb2 /etc/aliases /etc/aliases.db \
+            && chmod g=u -R /etc/pki/tls/private/sendmail.key /var/spool/clientmqueue /var/spool/mqueue /etc/sasldb2 /etc/aliases /etc/aliases.db /etc/mail/ /etc/passwd /usr/share/sendmail-cf/m4/proto.m4
 
 COPY        root /
 
